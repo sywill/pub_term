@@ -6,6 +6,7 @@ import { env } from './config/env.js';
 import { authRouter } from './modules/auth/auth.controller.js';
 import { sessionRouter } from './modules/session/session.controller.js';
 import { setupTerminalGateway } from './modules/terminal/terminal.gateway.js';
+import { requestLogger, errorHandler, logger } from './middleware/index.js';
 
 // Create Express app
 const app = express();
@@ -19,9 +20,10 @@ const io = new Server(httpServer, {
     },
 });
 
-// Middleware
+// Core middleware
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(express.json());
+app.use(requestLogger);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -35,9 +37,15 @@ app.use('/api/sessions', sessionRouter);
 // Setup WebSocket gateway
 setupTerminalGateway(io);
 
+// Global error handler (must be last)
+app.use(errorHandler);
+
 // Start server
 httpServer.listen(Number(env.PORT), () => {
-    console.log(`🚀 PubTerm server running on port ${env.PORT}`);
-    console.log(`   Environment: ${env.NODE_ENV}`);
-    console.log(`   CORS origin: ${env.CORS_ORIGIN}`);
+    logger.info(`🚀 PubTerm server running`, {
+        port: env.PORT,
+        environment: env.NODE_ENV,
+        cors: env.CORS_ORIGIN,
+    });
 });
+
