@@ -1,0 +1,229 @@
+.session-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr 250px;
+    grid-template-areas:
+        "header header"
+        "terminal sidebar";
+}
+
+.session-page.loading,
+.session-page.error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+}
+
+/* Header */
+.session-header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.back-link {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    transition: color var(--transition-fast);
+}
+
+.back-link:hover {
+    color: var(--color-accent);
+}
+
+.session-info h1 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-xs);
+}
+
+.session-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.role-badge {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    padding: 0.15rem 0.5rem;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+}
+
+.header-right {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* Terminal */
+.terminal-container {
+    grid-area: terminal;
+    padding: var(--space-md);
+    background: var(--color-bg-primary);
+    overflow: hidden;
+}
+
+/* Sidebar */
+.session-sidebar {
+    grid-area: sidebar;
+    padding: var(--space-lg);
+    background: var(--color-bg-secondary);
+    border-left: 1px solid var(--color-border);
+    overflow-y: auto;
+}
+
+.session-sidebar h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-md);
+}
+
+.members-list {
+    list-style: none;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.member-item:last-child {
+    border-bottom: none;
+}
+
+.member-name {
+    font-size: 0.875rem;
+}
+
+.member-role {
+    font-size: 0.65rem;
+}
+
+.badge-viewer {
+    background: rgba(99, 102, 241, 0.2);
+    color: #818cf8;
+}
+
+.badge-operator {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.badge-owner {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+.badge-active {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--color-success);
+}
+
+.badge-paused {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--color-warning);
+}
+
+.badge-terminated {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--color-error);
+}
+
+/* Invite Modal */
+.role-selector {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.role-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background: var(--color-bg-tertiary);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+}
+
+.role-option:hover {
+    border-color: var(--color-accent);
+}
+
+.role-option.active {
+    border-color: var(--color-accent);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.role-option strong {
+    color: var(--color-text-primary);
+}
+
+.role-option span {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.invite-link-box {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.invite-link-input {
+    flex: 1;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .session-page {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "header"
+            "terminal";
+    }
+
+    .session-sidebar {
+        display: none;
+    }
+
+    .session-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .terminal-container {
+        padding: var(--space-sm);
+    }
+}
