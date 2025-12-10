@@ -1,0 +1,107 @@
+// Database
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enums
+enum UserRole {
+  VIEWER
+  OPERATOR
+  ADMIN
+}
+
+enum SessionRole {
+  VIEWER
+  OPERATOR
+  OWNER
+}
+
+enum SessionStatus {
+  ACTIVE
+  PAUSED
+  TERMINATED
+}
+
+// Models
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(VIEWER)
+  
+  // Relations
+  ownedSessions  Session[]       @relation("SessionOwner")
+  memberships    SessionMember[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  status      SessionStatus @default(ACTIVE)
+  
+  // Owner relation
+  ownerId String
+  owner   User   @relation("SessionOwner", fields: [ownerId], references: [id])
+  
+  // Members
+  members SessionMember[]
+  
+  // Context files
+  contextFiles ContextFile[]
+  
+  // Terminal output buffer (last N lines for late joiners)
+  outputBuffer String @default("")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SessionMember {
+  id   String      @id @default(uuid())
+  role SessionRole @default(VIEWER)
+  
+  // Relations
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  // Unique constraint
+  @@unique([userId, sessionId])
+  
+  createdAt DateTime @default(now())
+}
+
+model ContextFile {
+  id       String @id @default(uuid())
+  filename String
+  content  String
+  mimeType String @default("text/plain")
+  
+  // Relations
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+}
+
+model InviteToken {
+  id        String      @id @default(uuid())
+  token     String      @unique
+  role      SessionRole @default(VIEWER)
+  sessionId String
+  expiresAt DateTime
+  usedAt    DateTime?
+  
+  createdAt DateTime @default(now())
+}
