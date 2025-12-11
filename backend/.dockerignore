@@ -1,0 +1,13 @@
+# Backend .dockerignore
+node_modules
+dist
+.env
+.env.local
+*.log
+.git
+.gitignore
+README.md
+.vscode
+coverage
+*.test.ts
+*.spec.ts

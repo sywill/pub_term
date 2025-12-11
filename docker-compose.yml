@@ -1,0 +1,63 @@
+# PubTerm Docker Compose Configuration
+# Includes: backend, frontend (nginx), and PostgreSQL
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: pubterm-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pubterm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pubterm_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-pubterm}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pubterm" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pubterm-network
+
+  # Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pubterm-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pubterm}:${POSTGRES_PASSWORD:-pubterm_secret}@postgres:5432/${POSTGRES_DB:-pubterm}
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pubterm-network
+    restart: unless-stopped
+
+  # Frontend (nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pubterm-frontend
+    ports:
+      - "${APP_PORT:-80}:80"
+    depends_on:
+      - backend
+    networks:
+      - pubterm-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+
+networks:
+  pubterm-network:
+    driver: bridge
