@@ -9,3 +9,4 @@ export {
     asyncHandler,
     type ApiResponse
 } from './error.middleware.js';
+export { setupSecurity, apiLimiter, authLimiter } from './security.middleware.js';
