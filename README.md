@@ -50,6 +50,25 @@ pub_term/
 - PostgreSQL (production) or SQLite (development)
 - Claude CLI (installed and authenticated on VPS)
 
+## Docker Deployment
+
+```bash
+# Copy and configure environment
+cp .env.docker.example .env
+# Edit .env with your settings (especially JWT_SECRET!)
+
+# Build and start all services
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+The app will be available at `http://localhost` (or your configured APP_PORT).
+
 ## License
 
 MIT
