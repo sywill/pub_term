@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import { prisma } from '../../config/database.js';
 import { env } from '../../config/env.js';
 import type { JwtPayload } from '../../middleware/auth.middleware.js';
@@ -97,7 +97,7 @@ export class AuthService {
     private generateToken(userId: string, email: string): string {
         const payload: JwtPayload = { userId, email };
         return jwt.sign(payload, env.JWT_SECRET, {
-            expiresIn: env.JWT_EXPIRES_IN,
+            expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
         });
     }
 }
