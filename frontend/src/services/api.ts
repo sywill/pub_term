@@ -99,6 +99,24 @@ export const sessionsApi = {
         });
         if (!res.ok) throw new Error('Failed to delete session');
     },
+
+    async uploadContextFile(token: string, sessionId: string, file: File) {
+        const content = await file.text();
+        const res = await fetch(`${API_URL}/api/sessions/${sessionId}/context`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                filename: file.name,
+                content,
+                mimeType: file.type || 'text/plain',
+            }),
+        });
+        if (!res.ok) throw new Error('Failed to upload file');
+        return res.json();
+    },
 };
 
 // WebSocket connection
