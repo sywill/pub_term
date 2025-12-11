@@ -4,6 +4,8 @@ import { Socket } from 'socket.io-client';
 import { useAuth } from '../hooks/useAuth';
 import { sessionsApi, createSocket } from '../services/api';
 import { Terminal } from '../components/Terminal';
+import { ConnectionStatus } from '../components/ConnectionStatus';
+import { FileUpload } from '../components/FileUpload';
 import './SessionPage.css';
 
 interface SessionData {
@@ -17,7 +19,7 @@ interface SessionData {
 
 export function SessionPage() {
     const { id } = useParams<{ id: string }>();
-    const { token, user } = useAuth();
+    const { token } = useAuth();
     const navigate = useNavigate();
 
     const [session, setSession] = useState<SessionData | null>(null);
@@ -28,6 +30,8 @@ export function SessionPage() {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [inviteLink, setInviteLink] = useState('');
     const [inviteRole, setInviteRole] = useState<'VIEWER' | 'OPERATOR'>('VIEWER');
+    const [showContextUpload, setShowContextUpload] = useState(false);
+    const [contextFiles, setContextFiles] = useState<string[]>([]);
 
     useEffect(() => {
         if (!id || !token) return;
@@ -66,6 +70,12 @@ export function SessionPage() {
 
     const handleCopyInvite = () => {
         navigator.clipboard.writeText(inviteLink);
+    };
+
+    const handleFileUpload = async (file: File) => {
+        if (!id || !token) return;
+        await sessionsApi.uploadContextFile(token, id, file);
+        setContextFiles(prev => [...prev, file.name]);
     };
 
     const handleDeleteSession = async () => {
@@ -125,6 +135,15 @@ export function SessionPage() {
                     </div>
                 </div>
                 <div className="header-right">
+                    <ConnectionStatus socket={socket} />
+                    {canWrite && (
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => setShowContextUpload(!showContextUpload)}
+                        >
+                            📁 Files
+                        </button>
+                    )}
                     {isOwner && (
                         <>
                             <button
@@ -166,6 +185,20 @@ export function SessionPage() {
                         </li>
                     ))}
                 </ul>
+
+                {showContextUpload && (
+                    <div className="context-upload-section">
+                        <h3>Context Files</h3>
+                        <FileUpload onUpload={handleFileUpload} />
+                        {contextFiles.length > 0 && (
+                            <ul className="context-files-list">
+                                {contextFiles.map((name, i) => (
+                                    <li key={i}>📄 {name}</li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
             </aside>
 
             {/* Invite Modal */}

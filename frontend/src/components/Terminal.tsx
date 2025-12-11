@@ -14,7 +14,6 @@ export function Terminal({ socket, sessionId, canWrite }: TerminalProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const terminalRef = useRef<XTerm | null>(null);
     const fitAddonRef = useRef<FitAddon | null>(null);
-    const [isConnected, setIsConnected] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
 
     useEffect(() => {
@@ -82,7 +81,6 @@ export function Terminal({ socket, sessionId, canWrite }: TerminalProps) {
         };
 
         const handleJoined = (info: { sessionId: string; role: string }) => {
-            setIsConnected(true);
             setConnectionStatus('connected');
             terminal.write(`\r\n\x1b[32m✓ Connected as ${info.role}\x1b[0m\r\n\r\n`);
         };
